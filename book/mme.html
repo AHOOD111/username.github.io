@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حجز موقع المخيم</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #1c1c1c;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            border-radius: 10px;
+        }
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 100px;
+            margin-right: 10px;
+        }
+        .title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .periods {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .period {
+            padding: 15px;
+            background: #333;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .period:hover {
+            background: #444;
+            cursor: pointer;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background: #333;
+            color: #fff;
+        }
+        button {
+            padding: 10px;
+            background: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .lang-switch {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .lang-switch button {
+            background: #555;
+            border: none;
+            padding: 5px 10px;
+            color: #fff;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .lang-switch button:hover {
+            background: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="logo-url-here" alt="Logo">
+            <h2 id="site-name">اسم الموقع</h2>
+        </div>
+        <div class="title">
+            <h2 id="form-title">حجز موقع المخيم</h2>
+        </div>
+        <form id="bookingForm">
+            <label for="name" id="name-label">الاسم الكامل</label>
+            <input type="text" id="name" name="name" required>
+            
+            <label for="email" id="email-label">البريد الإلكتروني</label>
+            <input type="email" id="email" name="email" required>
+            
+            <label for="date" id="date-label">تاريخ الحجز</label>
+            <input type="date" id="date" name="date" required>
+            
+            <div class="periods" id="periods">
+                <div class="period" data-period="9:00 AM - 4:00 PM" onclick="selectPeriod('9:00 AM - 4:00 PM')">
+                    9:00 صباحًا - 4:00 عصرًا
+                </div>
+                <div class="period" data-period="5:00 PM - 12:00 AM" onclick="selectPeriod('5:00 PM - 12:00 AM')">
+                    5:00 عصرًا - 12:00 صباحًا
+                </div>
+                <div class="period" data-period="5:00 AM - 8:00 AM" onclick="selectPeriod('5:00 AM - 8:00 AM')">
+                    5:00 صباحًا - 8:00 صباحًا
+                </div>
+            </div>
+            <input type="hidden" id="time" name="time" required>
+            
+            <button type="submit">إرسال</button>
+        </form>
+        <div class="lang-switch">
+            <button onclick="switchLang('ar')">العربية</button>
+            <button onclick="switchLang('en')">English</button>
+        </div>
+    </div>
+
+    <script>
+        var bookings = [];
+
+        function selectPeriod(period) {
+            document.getElementById('time').value = period;
+            var periods = document.getElementsByClassName('period');
+            for (var i = 0; i < periods.length; i++) {
+                periods[i].style.backgroundColor = '#333';
+            }
+            event.target.style.backgroundColor = '#555';
+        }
+
+        function switchLang(lang) {
+            if (lang === 'ar') {
+                document.getElementById('site-name').textContent = 'اسم الموقع';
+                document.getElementById('form-title').textContent = 'حجز موقع المخيم';
+                document.getElementById('name-label').textContent = 'الاسم الكامل';
+                document.getElementById('email-label').textContent = 'البريد الإلكتروني';
+                document.getElementById('date-label').textContent = 'تاريخ الحجز';
+                document.querySelector('button[type="submit"]').textContent = 'إرسال';
+            } else if (lang === 'en') {
+                document.getElementById('site-name').textContent = 'Site Name';
+                document.getElementById('form-title').textContent = 'Camp Booking';
+                document.getElementById('name-label').textContent = 'Full Name';
+                document.getElementById('email-label').textContent = 'Email Address';
+                document.getElementById('date-label').textContent = 'Booking Date';
+                document.querySelector('button[type="submit"]').textContent = 'Submit';
+            }
+        }
+
+        document.getElementById('bookingForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            var form = event.target;
+            var dateInput = form.date.value;
+            var selectedDate = new Date(dateInput);
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (selectedDate < today) {
+                alert('لا يمكنك الحجز في تاريخ فائت.');
+                return;
+            }
+
+            var selectedPeriod = form.time.value;
+            var bookingKey = dateInput + ' ' + selectedPeriod;
+
+            if (bookings.includes(bookingKey)) {
+                alert('التوقيت المحدد في هذا اليوم محجوز بالفعل.');
+                return;
+            }
+
+            bookings.push(bookingKey);
+            alert('تم إرسال طلب الحجز بنجاح!');
+
+            // أعد التوجيه إلى صفحة الشكر
+            window.location.href = 'file:///C:/Users/ahood/Desktop/thank.html';
+
+            // يمكنك إرسال بريد إلكتروني هنا عبر خدمة خوادم بريد إلكتروني خارجية
+        });
+    </script>
+</body>
+</html>
